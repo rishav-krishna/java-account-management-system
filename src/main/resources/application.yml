@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    username: uxda84jyihh60vb9
+    password: Q76TWKdshSHgFmt9CDUP
+    url: jdbc:mysql://uxda84jyihh60vb9:Q76TWKdshSHgFmt9CDUP@btu2b5sbpoat5f5nhoeg-mysql.services.clever-cloud.com:3306/btu2b5sbpoat5f5nhoeg
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        generate_statistics: false
