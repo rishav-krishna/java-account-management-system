@@ -121,8 +121,10 @@ public class LocationDetail {
 
   public void setExpenseCenterDetailSet(
       Set<ExpenseCenterDetail> expenseCenterDetailSet) {
-    for(ExpenseCenterDetail expenseCenterDetail: expenseCenterDetailSet) {
-      expenseCenterDetail.setLocationDetail(this);
-    }
+    this.expenseCenterDetailSet = expenseCenterDetailSet;
+  }
+
+  public Set<ExpenseCenterDetail> getExpenseCenterDetailSet() {
+    return expenseCenterDetailSet;
   }
 }

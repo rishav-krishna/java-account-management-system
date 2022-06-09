@@ -10,7 +10,6 @@ import com.example.accountmanagementsystem.entities.LocationDetail;
 import com.example.accountmanagementsystem.entities.OrganizationDetail;
 import com.example.accountmanagementsystem.model.EnterpriseLocationRequest;
 import com.example.accountmanagementsystem.model.EnterpriseRequest;
-import com.example.accountmanagementsystem.model.ExpenseCenterRequest;
 import com.example.accountmanagementsystem.model.LocationRequest;
 import com.example.accountmanagementsystem.model.OrganizationRequest;
 import com.example.accountmanagementsystem.repository.EntepriseRepository;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
@@ -50,8 +50,8 @@ public class RegistrationServiceImpl implements RegistrationService {
   public OrganizationDetail addOrganization(final OrganizationRequest organization) {
     return organizationRepository.save(
         OrganizationDetail.builder()
-            .orgName(organization.getName())
-            .address(organization.getAddress())
+            .orgName(organization.getOrganizationName())
+            .address(organization.getOrganizationAddress())
             .enterpriseDetails(Collections.emptySet())
             .isActive(1)
             .build()
@@ -63,22 +63,22 @@ public class RegistrationServiceImpl implements RegistrationService {
   public EnterpriseDetail addEnterpriseToOrganization(final EnterpriseRequest enterprise) {
     Optional<OrganizationDetail> organizationDetail =
         organizationRepository.findById(enterprise.getOrganizationId());
-    Integer enterpriseCode = 0;
+    int enterpriseCode = ENTERPRISE_ADD_VALUE;
     try {
       Optional<Integer> enterpriseCodeByOrgId =
           entepriseRepository.findEnterpriseCodeByOrgId(enterprise.getOrganizationId());
       if(enterpriseCodeByOrgId.isEmpty()) {
-        enterpriseCode = enterprise.getOrganizationId() * ENTERPRISE_START_VALUE;
+        enterpriseCode += enterprise.getOrganizationId() * ENTERPRISE_START_VALUE;
+      } else {
+        enterpriseCode += enterpriseCodeByOrgId.get();
       }
-      enterpriseCode = enterpriseCodeByOrgId.get() + ENTERPRISE_ADD_VALUE;
-      EnterpriseDetail enterpriseDetail = entepriseRepository.save(EnterpriseDetail.builder()
-          .enterpriseName(enterprise.getName())
-          .enterpriseAddress(enterprise.getAddress())
+      return entepriseRepository.save(EnterpriseDetail.builder()
+          .enterpriseName(enterprise.getEnterpriseName())
+          .enterpriseAddress(enterprise.getEnterpriseAddress())
           .enterpriseCode(enterpriseCode)
           .organizationDetail(organizationDetail.get())
           .build()
       );
-      return enterpriseDetail;
     } catch (Exception e) {
       throw e;
     }
@@ -88,17 +88,17 @@ public class RegistrationServiceImpl implements RegistrationService {
   @Transactional
   public EnterpriseDetail addEnterpriseAndLocation(final EnterpriseLocationRequest enterpriseLocationRequest) {
     EnterpriseRequest enterpriseRequest = EnterpriseRequest.builder()
-        .name(enterpriseLocationRequest.getEnterpriseName())
-        .address(enterpriseLocationRequest.getEnterpriseAddress())
+        .enterpriseName(enterpriseLocationRequest.getEnterpriseName())
+        .enterpriseAddress(enterpriseLocationRequest.getEnterpriseAddress())
         .organizationId(enterpriseLocationRequest.getOrganizationId())
         .build();
     EnterpriseDetail enterpriseDetail = addEnterpriseToOrganization(enterpriseRequest);
     LocationRequest locationRequest = LocationRequest.builder()
-        .name(enterpriseLocationRequest.getLocationName())
-        .address(enterpriseLocationRequest.getLocationAddress())
+        .locationName(enterpriseLocationRequest.getLocationName())
+        .locationAddress(enterpriseLocationRequest.getLocationAddress())
         .enterpriseId(enterpriseDetail.getEnterpriseId())
         .build();
-    LocationDetail locationDetail = addLocationToEnterprise(locationRequest);
+    enterpriseDetail.setLocationDetailSet(Set.of(addLocationToEnterprise(locationRequest)));
     return enterpriseDetail;
   }
 
@@ -118,8 +118,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     Integer enterpriseCode = enterpriseDetail.get().getEnterpriseCode();
     return locationRepository.save(LocationDetail.builder()
-        .locationName(locationRequest.getName())
-        .locationAddress(locationRequest.getAddress())
+        .locationName(locationRequest.getLocationName())
+        .locationAddress(locationRequest.getLocationAddress())
         .locationCode(locationCode)
         .enterpriseDetail(enterpriseDetail.get())
         .accountEnt("a"+enterpriseCode)

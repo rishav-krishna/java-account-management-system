@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class LocationRequest {
 
-  private String name;
-  private String address;
+  private String locationName;
+  private String locationAddress;
   private Integer enterpriseId;
 }

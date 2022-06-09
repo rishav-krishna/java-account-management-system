@@ -98,8 +98,10 @@ public class EnterpriseDetail {
 
   public void setLocationDetailSet(
       Set<LocationDetail> locationDetailSet) {
-    for(LocationDetail locationDetail: locationDetailSet) {
-      locationDetail.setEnterpriseDetail(this);
-    }
+    this.locationDetailSet = locationDetailSet;
+  }
+
+  public Set<LocationDetail> getLocationDetailSet() {
+    return locationDetailSet;
   }
 }

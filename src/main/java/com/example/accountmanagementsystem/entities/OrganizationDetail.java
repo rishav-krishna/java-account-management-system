@@ -76,8 +76,9 @@ public class OrganizationDetail {
   public void setEnterpriseDetails(
       Set<EnterpriseDetail> enterpriseDetails) {
     this.enterpriseDetails = enterpriseDetails;
-    for(EnterpriseDetail enterpriseDetail: enterpriseDetails) {
-      enterpriseDetail.setOrganizationDetail(this);
-    }
+  }
+
+  public Set<EnterpriseDetail> getEnterpriseDetails() {
+    return enterpriseDetails;
   }
 }

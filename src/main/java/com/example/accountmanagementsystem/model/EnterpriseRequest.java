@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class EnterpriseRequest {
-  private String name;
-  private String address;
+  private String enterpriseName;
+  private String enterpriseAddress;
   private Integer organizationId;
 }

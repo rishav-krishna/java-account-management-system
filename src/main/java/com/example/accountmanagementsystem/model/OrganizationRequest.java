@@ -13,6 +13,6 @@ import lombok.Setter;
 @Builder
 public class OrganizationRequest {
 
-  private String name;
-  private String address;
+  private String organizationName;
+  private String organizationAddress;
 }
