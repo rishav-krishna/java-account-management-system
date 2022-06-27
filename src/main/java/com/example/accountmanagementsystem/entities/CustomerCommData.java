@@ -1,12 +1,13 @@
 package com.example.accountmanagementsystem.entities;
 
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,25 +16,23 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Builder
+@Table(name = "customer_comm_data")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "expense_center_details")
+@Builder
 @Getter@Setter
-public class ExpenseCenterDetail {
+public class CustomerCommData {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "expense_center_id")
   private Integer id;
 
-  @Column(name = "expense_center_name")
-  private String name;
+  @Column(name = "communication_data")
+  private String communicationData;
 
-  @Column(name = "expense_center_code")
-  private Integer centerCode;
+  @Column(name = "communication_type")
+  private String communicationType;
 
-  @ManyToOne
-  @JoinColumn(name = "location_id", nullable = false)
-  private LocationDetail locationDetail;
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "customerCommData")
+  private Set<CustomerBasicDetail> customerBasicDetails = new java.util.LinkedHashSet<>();;
 }

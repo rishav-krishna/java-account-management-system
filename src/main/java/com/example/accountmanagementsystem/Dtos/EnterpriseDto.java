@@ -16,7 +16,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Getter
-@Setter
 public class EnterpriseDto {
 
   private Integer enterpriseId;
@@ -25,21 +24,24 @@ public class EnterpriseDto {
   private Integer enterpriseCode;
   private Integer organizationId;
   private List<Location> locations;
-  public static EnterpriseDto getEnterpriseDto(EnterpriseDetail enterpriseDetail) {
-    return EnterpriseDto.builder()
+  public static EnterpriseDto getEnterpriseDto(final EnterpriseDetail enterpriseDetail, final List<LocationDetail> locationDetails) {
+    EnterpriseDto enterpriseDto = EnterpriseDto.builder()
         .enterpriseId(enterpriseDetail.getEnterpriseId())
         .enterpriseName(enterpriseDetail.getEnterpriseName())
         .enterpriseAddress(enterpriseDetail.getEnterpriseAddress())
         .enterpriseCode(enterpriseDetail.getEnterpriseCode())
-        .organizationId(enterpriseDetail.getOrganizationDetail().getOrgId())
-        .locations(
+        .organizationId(enterpriseDetail.getOrganizationDetail().getOrgId()).build();
+    enterpriseDto.setLocations(locationDetails);
+    return enterpriseDto;
+  }
 
-            Optional.ofNullable(enterpriseDetail.getLocationDetailSet())
-                .orElse(Collections.emptySet())
-                .stream()
-                .map(l -> new Location(l.getLocationId(), l.getLocationName(), l.getLocationAddress(), l.getLocationCode()))
-                .collect(Collectors.toList())
-        ).build();
+  public void setLocations(final List<LocationDetail> locationDetails) {
+    locations = Optional.ofNullable(locationDetails)
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(l -> new Location(l.getLocationId(), l.getLocationName(), l.getLocationAddress(),
+            l.getLocationCode()))
+        .collect(Collectors.toList());
   }
 
   private static class Location {

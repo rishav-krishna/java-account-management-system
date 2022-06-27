@@ -12,13 +12,16 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "organization_details")
+@Getter@Setter
 public class OrganizationDetail {
 
   @Id
@@ -32,53 +35,6 @@ public class OrganizationDetail {
   @Column(name = "organization_address")
   private String address;
 
-//  @Column(name = "is_active", columnDefinition = "int default 1", nullable = false)
-//  private Integer isActive;
-
-  @Transient
+  @Column(name = "is_active", columnDefinition = "int default 1", nullable = false)
   private Integer isActive;
-
-  @OneToMany(mappedBy = "organizationDetail")
-  private Set<EnterpriseDetail> enterpriseDetails;
-
-  public Integer getOrgId() {
-    return orgId;
-  }
-
-  public String getOrgName() {
-    return orgName;
-  }
-
-  public String getAddress() {
-    return address;
-  }
-
-  public Integer getIsActive() {
-    return isActive;
-  }
-
-  public void setOrgId(Integer orgId) {
-    this.orgId = orgId;
-  }
-
-  public void setOrgName(String orgName) {
-    this.orgName = orgName;
-  }
-
-  public void setAddress(String address) {
-    this.address = address;
-  }
-
-  public void setIsActive(Integer isActive) {
-    this.isActive = isActive;
-  }
-
-  public void setEnterpriseDetails(
-      Set<EnterpriseDetail> enterpriseDetails) {
-    this.enterpriseDetails = enterpriseDetails;
-  }
-
-  public Set<EnterpriseDetail> getEnterpriseDetails() {
-    return enterpriseDetails;
-  }
 }

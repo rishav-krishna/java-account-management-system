@@ -26,20 +26,22 @@ public class OrganizationDto {
   private String organizationAddress;
   private List<Enterprise> enterprises;
 
-  public static OrganizationDto getOrganizationDto(final OrganizationDetail organizationDetail) {
+  public static OrganizationDto getOrganizationDto(final OrganizationDetail organizationDetail, final List<EnterpriseDetail> enterpriseDetails) {
+
     return OrganizationDto.builder()
         .organizationId(organizationDetail.getOrgId())
         .organizationName(organizationDetail.getOrgName())
         .organizationAddress(organizationDetail.getAddress())
         .enterprises(
-            Optional.ofNullable(organizationDetail.getEnterpriseDetails())
-                .orElse(Collections.emptySet())
+            Optional.ofNullable(enterpriseDetails)
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(e -> new Enterprise(e.getEnterpriseId(), e.getEnterpriseName(), e.getEnterpriseAddress(), e.getEnterpriseCode())).collect(Collectors.toList())
         )
         .build();
   }
 
+  @Getter
   private static class Enterprise {
     private final Integer enterpriseId;
     private final String enterpriseName;
@@ -52,22 +54,6 @@ public class OrganizationDto {
       this.enterpriseName = enterpriseName;
       this.enterpriseAddress = enterpriseAddress;
       this.enterpriseCode = enterpriseCode;
-    }
-
-    public Integer getEnterpriseId() {
-      return enterpriseId;
-    }
-
-    public String getEnterpriseName() {
-      return enterpriseName;
-    }
-
-    public String getEnterpriseAddress() {
-      return enterpriseAddress;
-    }
-
-    public Integer getEnterpriseCode() {
-      return enterpriseCode;
     }
   }
 }

@@ -28,7 +28,7 @@ public class LocationDto {
   private Integer enterpriseId;
   private List<ExpenseCenter> expenseCenters;
 
-  public static LocationDto getLocationDto(LocationDetail locationDetail) {
+  public static LocationDto getLocationDto(LocationDetail locationDetail, final List<ExpenseCenterDetail> expenseCenterDetails) {
     return LocationDto.builder()
         .locationId(locationDetail.getLocationId())
         .locationName(locationDetail.getLocationName())
@@ -38,8 +38,8 @@ public class LocationDto {
         .taxEnt(locationDetail.getTaxEnt())
         .enterpriseId(locationDetail.getEnterpriseDetail().getEnterpriseId())
         .expenseCenters(
-            Optional.ofNullable(locationDetail.getExpenseCenterDetailSet())
-                .orElse(Collections.emptySet())
+            Optional.ofNullable(expenseCenterDetails)
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(e -> new ExpenseCenter(e.getId(), e.getName(), e.getCenterCode()))
                 .collect(Collectors.toList())

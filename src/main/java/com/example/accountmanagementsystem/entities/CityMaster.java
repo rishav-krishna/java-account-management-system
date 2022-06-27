@@ -5,35 +5,36 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Builder
+@Table(name = "city_master")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "expense_center_details")
 @Getter@Setter
-public class ExpenseCenterDetail {
+public class CityMaster {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "expense_center_id")
-  private Integer id;
+  @Column(name = "city_id")
+  private Integer cityId;
 
-  @Column(name = "expense_center_name")
-  private String name;
+  @Column(name = "city_name")
+  private String cityName;
 
-  @Column(name = "expense_center_code")
-  private Integer centerCode;
+  @Column(name = "city_pincode", unique = true)
+  private Integer cityPinCode;
 
-  @ManyToOne
-  @JoinColumn(name = "location_id", nullable = false)
-  private LocationDetail locationDetail;
+  @Column(name = "district_name")
+  private String districtName;
+
+  @Column(name = "state_name")
+  private String stateName;
+
+  @Column(name = "contry_Name")
+  private String countryName;
 }

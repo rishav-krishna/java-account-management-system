@@ -15,6 +15,7 @@ import com.example.accountmanagementsystem.model.LocationRequest;
 import com.example.accountmanagementsystem.model.OrganizationRequest;
 import com.example.accountmanagementsystem.service.ReaderService;
 import com.example.accountmanagementsystem.service.RegistrationService;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -46,8 +47,7 @@ public class AccountSystemController {
 
   @PostMapping("/add-organization")
   public ResponseEntity<OrganizationDto> addOrganization(@RequestBody OrganizationRequest organizationRequest) {
-    OrganizationDetail organizationDetail = registrationService.addOrganization(organizationRequest);
-    return new ResponseEntity<>(OrganizationDto.getOrganizationDto(organizationDetail), HttpStatus.CREATED);
+    return new ResponseEntity<>(registrationService.addOrganization(organizationRequest), HttpStatus.CREATED);
   }
 
   @GetMapping("/get-organization/{id}")
@@ -67,30 +67,33 @@ public class AccountSystemController {
 
   @PostMapping("/add-enterprise")
   public ResponseEntity<EnterpriseDto> addEnterpriseToOrganization(@RequestBody EnterpriseRequest enterprise) {
-    EnterpriseDetail enterpriseDetail =
-        registrationService.addEnterpriseToOrganization(enterprise);
-    log.info(enterpriseDetail.toString());
-    return new ResponseEntity<>(EnterpriseDto.getEnterpriseDto(enterpriseDetail), HttpStatus.CREATED);
+    return new ResponseEntity<>(
+        registrationService.addEnterpriseToOrganization(enterprise),
+        HttpStatus.CREATED);
   }
 
   @PostMapping("/add-enterprise-location")
   public ResponseEntity<EnterpriseDto> addEnterpriseAndLocation(@RequestBody EnterpriseLocationRequest enterpriseLocationRequest) {
-    EnterpriseDetail enterpriseDetail =
-        registrationService.addEnterpriseAndLocation(enterpriseLocationRequest);
-    return new ResponseEntity<>(EnterpriseDto.getEnterpriseDto(enterpriseDetail), HttpStatus.CREATED);
+    return new ResponseEntity<>(
+        registrationService.addEnterpriseAndLocation(enterpriseLocationRequest),
+        HttpStatus.CREATED);
   }
 
-  @PostMapping("/add-location")
-  public ResponseEntity<LocationDto> addLocationToEnterprise(@RequestBody LocationRequest locationRequest) {
-    LocationDetail locationDetail = registrationService.addLocationToEnterprise(locationRequest);
-    return new ResponseEntity<>(LocationDto.getLocationDto(locationDetail), HttpStatus.CREATED);
+  @PostMapping("/add-location/{enterpriseId}")
+  public ResponseEntity<List<LocationDto>> addLocationToEnterprise(@RequestBody LocationRequest locationRequest,
+                                                                   @PathVariable("enterpriseId") Integer enterpriseId) {
+    List<LocationDetail> locationDetails =
+        registrationService.addLocationToEnterprise(locationRequest, enterpriseId);
+    return new ResponseEntity<>(
+        readerService.getLocationDtos(locationDetails),
+        HttpStatus.CREATED);
   }
 
   @PostMapping("/add-expense-center")
   public ResponseEntity<List<ExpenseCenterDto>> addExpenseCenterToLocation(@RequestBody ExpenseCenterRequest expenseCenterRequests) {
-    List<ExpenseCenterDetail> expenseCenterDetails =
+    return new ResponseEntity<>(
         registrationService.addExpenseCenterToLocation(expenseCenterRequests.getCenterNames(),
-            expenseCenterRequests.getLocationId());
-    return new ResponseEntity<>(ExpenseCenterDto.getExpenseCenterDtos(expenseCenterDetails), HttpStatus.CREATED);
+            expenseCenterRequests.getLocationId()) ,
+        HttpStatus.CREATED);
   }
 }

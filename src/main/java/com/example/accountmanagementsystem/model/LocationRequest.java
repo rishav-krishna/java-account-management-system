@@ -1,5 +1,6 @@
 package com.example.accountmanagementsystem.model;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,13 @@ import lombok.Setter;
 @Setter
 public class LocationRequest {
 
-  private String locationName;
-  private String locationAddress;
-  private Integer enterpriseId;
+  private List<LocationData> locationData;
+
+  @AllArgsConstructor
+  @NoArgsConstructor@Getter@Setter
+  public static class LocationData{
+
+    private String locationName;
+    private String locationAddress;
+  }
 }

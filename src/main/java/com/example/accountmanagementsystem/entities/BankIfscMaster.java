@@ -5,35 +5,32 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Builder
+@Table(name = "bank_ifsc_master")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "expense_center_details")
 @Getter@Setter
-public class ExpenseCenterDetail {
+public class BankIfscMaster {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "expense_center_id")
   private Integer id;
 
-  @Column(name = "expense_center_name")
-  private String name;
+  @Column(name = "branch_ifsc_code")
+  private String branchIfscCode;
 
-  @Column(name = "expense_center_code")
-  private Integer centerCode;
+  @Column(name = "branch_name")
+  private String branchName;
 
-  @ManyToOne
-  @JoinColumn(name = "location_id", nullable = false)
-  private LocationDetail locationDetail;
+  @Column(name = "bank_name")
+  private String bankName;
+
+  @Column(name = "branch_address")
+  private String branchAddress;
 }

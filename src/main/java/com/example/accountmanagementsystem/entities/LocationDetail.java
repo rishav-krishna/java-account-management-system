@@ -22,6 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "location_details")
+@Getter@Setter
 public class LocationDetail {
 
   @Id
@@ -50,81 +51,4 @@ public class LocationDetail {
   @ManyToOne
   @JoinColumn(name = "enterprise_id", nullable = false)
   private EnterpriseDetail enterpriseDetail;
-
-  @OneToMany(mappedBy = "locationDetail")
-  private Set<ExpenseCenterDetail> expenseCenterDetailSet;
-
-  public Integer getLocationId() {
-    return locationId;
-  }
-
-  public void setLocationId(Integer locationId) {
-    this.locationId = locationId;
-  }
-
-  public String getLocationName() {
-    return locationName;
-  }
-
-  public void setLocationName(String locationName) {
-    this.locationName = locationName;
-  }
-
-  public String getLocationAddress() {
-    return locationAddress;
-  }
-
-  public void setLocationAddress(String locationAddress) {
-    this.locationAddress = locationAddress;
-  }
-
-  public EnterpriseDetail getEnterpriseDetail() {
-    return enterpriseDetail;
-  }
-
-  public void setEnterpriseDetail(
-      EnterpriseDetail enterpriseDetail) {
-    this.enterpriseDetail = enterpriseDetail;
-  }
-
-  public Integer getIsActive() {
-    return isActive;
-  }
-
-  public void setIsActive(Integer isActive) {
-    this.isActive = isActive;
-  }
-
-  public Integer getLocationCode() {
-    return locationCode;
-  }
-
-  public void setLocationCode(Integer locationCode) {
-    this.locationCode = locationCode;
-  }
-
-  public String getAccountEnt() {
-    return accountEnt;
-  }
-
-  public void setAccountEnt(String accountEnt) {
-    this.accountEnt = accountEnt;
-  }
-
-  public String getTaxEnt() {
-    return taxEnt;
-  }
-
-  public void setTaxEnt(String taxEnt) {
-    this.taxEnt = taxEnt;
-  }
-
-  public void setExpenseCenterDetailSet(
-      Set<ExpenseCenterDetail> expenseCenterDetailSet) {
-    this.expenseCenterDetailSet = expenseCenterDetailSet;
-  }
-
-  public Set<ExpenseCenterDetail> getExpenseCenterDetailSet() {
-    return expenseCenterDetailSet;
-  }
 }

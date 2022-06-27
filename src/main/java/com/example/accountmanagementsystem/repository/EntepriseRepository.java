@@ -1,6 +1,7 @@
 package com.example.accountmanagementsystem.repository;
 
 import com.example.accountmanagementsystem.entities.EnterpriseDetail;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,4 +12,7 @@ public interface EntepriseRepository extends JpaRepository<EnterpriseDetail, Int
 
   @Query(value = "select enterprise_code from enterprise_details WHERE organization_id = :organizationId order by enterprise_code desc limit 1", nativeQuery = true)
   Optional<Integer> findEnterpriseCodeByOrgId(Integer organizationId);
+
+  @Query(value = "select * from enterprise_details ed where ed.organization_id = :orgId", nativeQuery = true)
+  List<EnterpriseDetail> findEnterpriseDetailsByOrganizationDetail(Integer orgId);
 }

@@ -4,6 +4,10 @@ import static com.example.accountmanagementsystem.constants.ApplicationConstants
 import static com.example.accountmanagementsystem.constants.ApplicationConstants.ENTERPRISE_START_VALUE;
 import static com.example.accountmanagementsystem.constants.ApplicationConstants.LOCATION_INCREMENT_VALUE;
 
+import com.example.accountmanagementsystem.Dtos.EnterpriseDto;
+import com.example.accountmanagementsystem.Dtos.ExpenseCenterDto;
+import com.example.accountmanagementsystem.Dtos.LocationDto;
+import com.example.accountmanagementsystem.Dtos.OrganizationDto;
 import com.example.accountmanagementsystem.entities.EnterpriseDetail;
 import com.example.accountmanagementsystem.entities.ExpenseCenterDetail;
 import com.example.accountmanagementsystem.entities.LocationDetail;
@@ -47,20 +51,20 @@ public class RegistrationServiceImpl implements RegistrationService {
   }
 
   @Override
-  public OrganizationDetail addOrganization(final OrganizationRequest organization) {
-    return organizationRepository.save(
+  public OrganizationDto addOrganization(final OrganizationRequest organization) {
+    OrganizationDetail organizationDetail = organizationRepository.save(
         OrganizationDetail.builder()
             .orgName(organization.getOrganizationName())
             .address(organization.getOrganizationAddress())
-            .enterpriseDetails(Collections.emptySet())
             .isActive(1)
             .build()
     );
+    return OrganizationDto.getOrganizationDto(organizationDetail, Collections.emptyList());
   }
 
   @Override
   @Transactional
-  public EnterpriseDetail addEnterpriseToOrganization(final EnterpriseRequest enterprise) {
+  public EnterpriseDto addEnterpriseToOrganization(final EnterpriseRequest enterprise) {
     Optional<OrganizationDetail> organizationDetail =
         organizationRepository.findById(enterprise.getOrganizationId());
     int enterpriseCode = ENTERPRISE_ADD_VALUE;
@@ -72,13 +76,14 @@ public class RegistrationServiceImpl implements RegistrationService {
       } else {
         enterpriseCode += enterpriseCodeByOrgId.get();
       }
-      return entepriseRepository.save(EnterpriseDetail.builder()
+      EnterpriseDetail enterpriseDetail = entepriseRepository.save(EnterpriseDetail.builder()
           .enterpriseName(enterprise.getEnterpriseName())
           .enterpriseAddress(enterprise.getEnterpriseAddress())
           .enterpriseCode(enterpriseCode)
           .organizationDetail(organizationDetail.get())
           .build()
       );
+      return EnterpriseDto.getEnterpriseDto(enterpriseDetail, Collections.emptyList());
     } catch (Exception e) {
       throw e;
     }
@@ -86,49 +91,52 @@ public class RegistrationServiceImpl implements RegistrationService {
 
   @Override
   @Transactional
-  public EnterpriseDetail addEnterpriseAndLocation(final EnterpriseLocationRequest enterpriseLocationRequest) {
+  public EnterpriseDto addEnterpriseAndLocation(final EnterpriseLocationRequest enterpriseLocationRequest) {
     EnterpriseRequest enterpriseRequest = EnterpriseRequest.builder()
         .enterpriseName(enterpriseLocationRequest.getEnterpriseName())
         .enterpriseAddress(enterpriseLocationRequest.getEnterpriseAddress())
         .organizationId(enterpriseLocationRequest.getOrganizationId())
         .build();
-    EnterpriseDetail enterpriseDetail = addEnterpriseToOrganization(enterpriseRequest);
-    LocationRequest locationRequest = LocationRequest.builder()
-        .locationName(enterpriseLocationRequest.getLocationName())
-        .locationAddress(enterpriseLocationRequest.getLocationAddress())
-        .enterpriseId(enterpriseDetail.getEnterpriseId())
-        .build();
-    enterpriseDetail.setLocationDetailSet(Set.of(addLocationToEnterprise(locationRequest)));
-    return enterpriseDetail;
+    EnterpriseDto enterpriseDto = addEnterpriseToOrganization(enterpriseRequest);
+    LocationRequest.LocationData locationData = new LocationRequest.LocationData(
+        enterpriseLocationRequest.getLocationName(),
+        enterpriseLocationRequest.getLocationAddress());
+    List<LocationDetail> locationDetails =
+        addLocationToEnterprise(new LocationRequest(List.of(locationData)), enterpriseDto.getEnterpriseId());
+    enterpriseDto.setLocations(locationDetails);
+    return enterpriseDto;
   }
 
   @Override
   @Transactional
-  public LocationDetail addLocationToEnterprise(LocationRequest locationRequest) {
+  public List<LocationDetail> addLocationToEnterprise(LocationRequest locationRequest, Integer enterpriseId) {
     Optional<Integer> optionalLocationCode =
-        locationRepository.findLocationCodeByEntId(locationRequest.getEnterpriseId());
+        locationRepository.findLocationCodeByEntId(enterpriseId);
     Optional<EnterpriseDetail> enterpriseDetail =
-        entepriseRepository.findById(locationRequest.getEnterpriseId());
+        entepriseRepository.findById(enterpriseId);
     if(enterpriseDetail.isEmpty()) {
       throw new IllegalStateException("Enterprise is not present for location");
     }
 
-    Integer locationCode = optionalLocationCode.map(integer -> integer + LOCATION_INCREMENT_VALUE)
-        .orElseGet(() -> enterpriseDetail.get().getEnterpriseCode() + LOCATION_INCREMENT_VALUE);
-
     Integer enterpriseCode = enterpriseDetail.get().getEnterpriseCode();
-    return locationRepository.save(LocationDetail.builder()
-        .locationName(locationRequest.getLocationName())
-        .locationAddress(locationRequest.getLocationAddress())
-        .locationCode(locationCode)
-        .enterpriseDetail(enterpriseDetail.get())
-        .accountEnt("a"+enterpriseCode)
-        .taxEnt("t"+ enterpriseCode)
-        .build());
+    AtomicInteger locationCode = new AtomicInteger(optionalLocationCode.map(integer -> integer + LOCATION_INCREMENT_VALUE)
+        .orElseGet(() -> enterpriseDetail.get().getEnterpriseCode() + LOCATION_INCREMENT_VALUE));
+    return locationRequest.getLocationData().stream().map(l->{
+      Integer lc = locationCode.get();
+      locationCode.getAndAdd(LOCATION_INCREMENT_VALUE);
+      return locationRepository.save(LocationDetail.builder()
+          .locationName(l.getLocationName())
+          .locationAddress(l.getLocationAddress())
+          .locationCode(lc)
+          .enterpriseDetail(enterpriseDetail.get())
+          .accountEnt("a" + enterpriseCode)
+          .taxEnt("t" + enterpriseCode)
+          .build());
+    }).collect(Collectors.toList());
   }
 
   @Override
-  public List<ExpenseCenterDetail> addExpenseCenterToLocation(
+  public List<ExpenseCenterDto> addExpenseCenterToLocation(
       List<String> expenseCenterRequests, Integer locationId) {
 
     Optional<LocationDetail> optionalLocationDetail = locationRepository.findById(locationId);
@@ -138,13 +146,16 @@ public class RegistrationServiceImpl implements RegistrationService {
     Optional<Integer> locationCode = expenseCenterRepository.findExpenseCodeByLocId(locationId);
     AtomicInteger count = new AtomicInteger(1);
 
-    return expenseCenterRequests.stream().map(e -> {
-      Integer centerCode = locationCode.orElseGet(() -> optionalLocationDetail.get().getLocationCode()) + count.getAndIncrement();
+    List<ExpenseCenterDetail> expenseCenterDetails = expenseCenterRequests.stream().map(e -> {
+      Integer centerCode =
+          locationCode.orElseGet(() -> optionalLocationDetail.get().getLocationCode()) +
+              count.getAndIncrement();
       return expenseCenterRepository.save(ExpenseCenterDetail.builder()
           .name(e)
           .centerCode(centerCode)
           .locationDetail(optionalLocationDetail.get())
           .build());
     }).collect(Collectors.toList());
+    return ExpenseCenterDto.getExpenseCenterDtos(expenseCenterDetails);
   }
 }
