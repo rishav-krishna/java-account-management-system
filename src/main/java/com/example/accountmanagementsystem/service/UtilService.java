@@ -11,5 +11,5 @@ public interface UtilService {
   List<CreditTerm> getAllCreditTerms();
   List<DistributionChannel> getAllDistributionChannel();
 //  List<PaymentTemr> getAllPaymentTerms();
-  Optional<CityMaster> getCityDetails(Integer pinCode);
+  Optional<CityMaster> getCityDetail(Integer pinCode);
 }

@@ -38,7 +38,7 @@ public class UtilServiceImpl implements UtilService {
   }
 
   @Override
-  public Optional<CityMaster> getCityDetails(Integer pinCode) {
+  public Optional<CityMaster> getCityDetail(Integer pinCode) {
     return cityMasterRepository.findCityMasterByCityPinCode(pinCode);
   }
 

@@ -4,6 +4,7 @@ import com.example.accountmanagementsystem.Dtos.CustomerCommDto;
 import com.example.accountmanagementsystem.Dtos.CustomerDto;
 import com.example.accountmanagementsystem.Dtos.CustomerPaymentDto;
 import com.example.accountmanagementsystem.Dtos.CustomerPurchasingDto;
+import com.example.accountmanagementsystem.entities.CityMaster;
 import com.example.accountmanagementsystem.entities.CreditTerm;
 import com.example.accountmanagementsystem.entities.CustomerCommData;
 import com.example.accountmanagementsystem.entities.CustomerPaymentData;
@@ -16,6 +17,7 @@ import com.example.accountmanagementsystem.model.CustomerRequest;
 import com.example.accountmanagementsystem.service.CustomerService;
 import com.example.accountmanagementsystem.service.UtilService;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,5 +76,14 @@ public class CustomerController {
   @GetMapping("/get-distribution-channels")
   public ResponseEntity<List<DistributionChannel>> getAllDistributionChannels() {
     return new ResponseEntity<>(utilService.getAllDistributionChannel(), HttpStatus.OK);
+  }
+
+  @GetMapping("/get-city-detail/{pinCode}")
+  public ResponseEntity<CityMaster> getCityDetail(@PathVariable("pinCode") Integer pinCode) {
+    Optional<CityMaster> cityDetail = utilService.getCityDetail(pinCode);
+    if(cityDetail.isEmpty()){
+      throw new RuntimeException("Invalid pinCode");
+    }
+    return new ResponseEntity<>(cityDetail.get(), HttpStatus.OK);
   }
 }
