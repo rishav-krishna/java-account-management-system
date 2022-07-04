@@ -1,6 +1,10 @@
 package com.example.accountmanagementsystem.service.impl;
 
+import static com.example.accountmanagementsystem.constants.ApplicationConstants.CUSTOMER_INCREMENT_VALUE;
+import static com.example.accountmanagementsystem.constants.ApplicationConstants.CUSTOMER_START_VALUE;
+
 import com.example.accountmanagementsystem.Dtos.CustomerDto;
+import com.example.accountmanagementsystem.constants.Errors;
 import com.example.accountmanagementsystem.entities.BankIfscMaster;
 import com.example.accountmanagementsystem.entities.CreditTerm;
 import com.example.accountmanagementsystem.entities.CustomerBasicDetail;
@@ -9,6 +13,7 @@ import com.example.accountmanagementsystem.entities.CustomerPaymentData;
 import com.example.accountmanagementsystem.entities.CustomerPurchasingData;
 import com.example.accountmanagementsystem.entities.DistributionChannel;
 import com.example.accountmanagementsystem.entities.OrganizationDetail;
+import com.example.accountmanagementsystem.exception.InvalidRequestException;
 import com.example.accountmanagementsystem.model.CustomerCommunicationRequest;
 import com.example.accountmanagementsystem.model.CustomerPaymentRequest;
 import com.example.accountmanagementsystem.model.CustomerPurchasingRequest;
@@ -90,10 +95,18 @@ public class CustomerServiceImpl implements CustomerService {
     Optional<OrganizationDetail> organizationDetail =
         organizationRepository.findById(customerRequest.getOrganizationId());
     if(organizationDetail.isEmpty())
-      throw new RuntimeException("Invalid organizationId");
+      throw new InvalidRequestException(Errors.Organization.INVALID_ORG_ID);
 
+    Optional<String> customerCodeByOrgId =
+        customerDetailRepository.findCustomerCodeByOrgId(customerRequest.getOrganizationId());
+//    Integer customerCode = 0;
+//    if(customerCodeByOrgId.isEmpty()) {
+//      customerCode = customerRequest.getOrganizationId() * CUSTOMER_START_VALUE;
+//    } else {
+//      customerCode = customerCodeByOrgId.get() + CUSTOMER_INCREMENT_VALUE;
+//    }
     CustomerBasicDetail customerBasicDetail = customerDetailRepository.save(CustomerBasicDetail.builder()
-        .customerCode("bbbbbb")//todo how to set customerCode
+        .customerCode("Caaaaa")
         .customerName(customerRequest.getCustomerName())
         .customerAddress(customerRequest.getCustomerAddress())
         .customerPinCode(customerRequest.getPinCode())
@@ -106,9 +119,12 @@ public class CustomerServiceImpl implements CustomerService {
     List<CustomerPaymentData> customerPaymentData =
         addCustomerPaymentDetail(customerRequest.getCustomerPaymentRequests(),
             customerBasicDetail.getCustomerId());
+    customerPaymentData.forEach(customerBasicDetail::addCustomerPaymentData);
     List<CustomerCommData> customerCommData =
         addCustomerCommDetail(customerRequest.getCustomerCommunicationRequests(),
             customerBasicDetail.getCustomerId());
+    customerCommData.forEach(customerBasicDetail::addCustomerCommData);
+    customerDetailRepository.save(customerBasicDetail);
     return CustomerDto.getCustomerDto(customerBasicDetail, customerPurchasingData, customerPaymentData, customerCommData);
   }
 
@@ -119,7 +135,7 @@ public class CustomerServiceImpl implements CustomerService {
       return Collections.emptyList();
     Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
     if(customerBasicDetail.isEmpty())
-      throw new RuntimeException("Invalid customerId");
+      throw new InvalidRequestException(Errors.Customer.INVALID_CUSTOMER_ID);
     return customerPurchasingRequests.stream().map(c -> customerPurchasingRepository.save(
         CustomerPurchasingData.builder()
             .customerVatTin(c.getCustomerVatTin())
@@ -138,21 +154,16 @@ public class CustomerServiceImpl implements CustomerService {
       List<CustomerPaymentRequest> customerPaymentRequests, Integer customerId) {
     if(customerPaymentRequests.isEmpty())
       return Collections.emptyList();
-//    Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
-//    if(customerBasicDetail.isEmpty())
-//      throw new RuntimeException("Invalid customerId");
-//    return customerPaymentRequests.stream().map(c->{
-//
-//      customerPaymentRepository.save(
-//          CustomerPaymentData.builder()
-//              .customerAccountNbr(c.getCustomerAccountNumber())
-//              .bankIfscCode(bankIfscMap.get(c.getIfscCode()))
-//              .accountType(c.getAccountType())
-//              .accountHolderName(c.getAccountHolderName())
-//              .
-//      )
-//    })
-    return null;
+    Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
+    if(customerBasicDetail.isEmpty())
+      throw new InvalidRequestException(Errors.Customer.INVALID_CUSTOMER_ID);
+    return customerPaymentRequests.stream().map(c-> customerPaymentRepository.save(
+        CustomerPaymentData.builder()
+            .customerAccountNbr(c.getCustomerAccountNumber())
+            .bankIfscCode(bankIfscMap.get(c.getIfscCode()))
+            .accountType(c.getAccountType())
+            .accountHolderName(c.getAccountHolderName())
+            .build())).collect(Collectors.toList());
   }
 
   @Override
@@ -160,6 +171,13 @@ public class CustomerServiceImpl implements CustomerService {
       List<CustomerCommunicationRequest> customerCommunicationRequests, Integer customerId) {
     if(customerCommunicationRequests.isEmpty())
       return Collections.emptyList();
-    return null;
+    Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
+    if(customerBasicDetail.isEmpty())
+      throw new InvalidRequestException(Errors.Customer.INVALID_CUSTOMER_ID);
+    return customerCommunicationRequests.stream().map(c->customerCommRepository.save(
+        CustomerCommData.builder()
+            .communicationType(c.getCommunicationType())
+            .communicationData(c.getCommunicationData())
+            .build())).collect(Collectors.toList());
   }
 }

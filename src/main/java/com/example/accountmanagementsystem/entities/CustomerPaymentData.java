@@ -44,5 +44,5 @@ public class CustomerPaymentData {
   private String accountHolderName;
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "customerPaymentData")
-  private Set<CustomerBasicDetail> customerBasicDetail;
+  private Set<CustomerBasicDetail> customerBasicDetails;
 }

@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    username: uxda84jyihh60vb9
-    password: Q76TWKdshSHgFmt9CDUP
-    url: jdbc:mysql://uxda84jyihh60vb9:Q76TWKdshSHgFmt9CDUP@btu2b5sbpoat5f5nhoeg-mysql.services.clever-cloud.com:3306/btu2b5sbpoat5f5nhoeg
+    username: root
+    password: Saurabh.10
+    url: jdbc:mysql://accounterp.cb67gu1lvxk6.us-west-2.rds.amazonaws.com:3306/accountERP
 
   jpa:
     show-sql: true

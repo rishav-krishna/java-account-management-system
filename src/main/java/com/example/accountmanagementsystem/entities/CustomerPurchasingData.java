@@ -42,14 +42,14 @@ public class CustomerPurchasingData{
   private String customerUdyogAadharNbr;
 
   @ManyToOne
-  @JoinColumn(name = "id", nullable = false)
+  @JoinColumn(name = "credit_term_code", nullable = false)
   private CreditTerm customerCreditTerm;
 
   @ManyToOne
-  @JoinColumn(name = "channelId", nullable = false)
+  @JoinColumn(name = "dist_channel_code", nullable = false)
   private DistributionChannel distributionChannel;
 
   @ManyToOne
-  @JoinColumn(name = "customer_id_fk", nullable = false)
+  @JoinColumn(name = "customer_id", nullable = false)
   private CustomerBasicDetail customerBasicDetail;
 }

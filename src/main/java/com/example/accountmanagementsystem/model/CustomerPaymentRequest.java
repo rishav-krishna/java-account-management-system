@@ -1,5 +1,6 @@
 package com.example.accountmanagementsystem.model;
 
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CustomerPaymentRequest {
+public class CustomerPaymentRequest implements Serializable {
 
   private String customerAccountNumber;
   private String IfscCode;

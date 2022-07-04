@@ -45,7 +45,7 @@ public class CustomerBasicDetail {
   private Integer customerPinCode;
 
   @ManyToOne
-  @JoinColumn(name = "org_id_fk", nullable = false)
+  @JoinColumn(name = "organization_id", nullable = false)
   private OrganizationDetail organizationDetail;
 
   @ManyToMany(fetch = FetchType.LAZY)
@@ -58,5 +58,31 @@ public class CustomerBasicDetail {
   @JoinTable(name = "customer_bank_intermidate", joinColumns =
       {@JoinColumn(referencedColumnName = "customer_id")}
       , inverseJoinColumns = {@JoinColumn(referencedColumnName = "customer_payment_id")})
-  private Set<CustomerPaymentData> customerPaymentData = new java.util.LinkedHashSet<>();;
+  private Set<CustomerPaymentData> customerPaymentData = new java.util.LinkedHashSet<>();
+
+  public void addCustomerPaymentData(CustomerPaymentData customerPaymentData) {
+    this.customerPaymentData.add(customerPaymentData);
+    customerPaymentData.getCustomerBasicDetails().add(this);
+  }
+
+  public void removeCustomerPaymentData(Integer customerPaymentId) {
+    CustomerPaymentData cpd = this.customerPaymentData.stream().filter(t -> t.getCustomerPaymentId() == customerPaymentId).findFirst().orElse(null);
+    if (cpd != null) {
+      this.customerPaymentData.remove(cpd);
+      cpd.getCustomerBasicDetails().remove(this);
+    }
+  }
+
+  public void addCustomerCommData(CustomerCommData customerCommData) {
+    this.customerCommData.add(customerCommData);
+    customerCommData.getCustomerBasicDetails().add(this);
+  }
+
+  public void removeCustomerCommData(Integer id) {
+    CustomerCommData ccd = this.customerCommData.stream().filter(t -> t.getId() == id).findFirst().orElse(null);
+    if (ccd != null) {
+      this.customerCommData.remove(ccd);
+      ccd.getCustomerBasicDetails().remove(this);
+    }
+  }
 }

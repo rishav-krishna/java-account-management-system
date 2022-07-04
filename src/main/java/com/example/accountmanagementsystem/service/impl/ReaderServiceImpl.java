@@ -3,10 +3,12 @@ package com.example.accountmanagementsystem.service.impl;
 import com.example.accountmanagementsystem.Dtos.EnterpriseDto;
 import com.example.accountmanagementsystem.Dtos.LocationDto;
 import com.example.accountmanagementsystem.Dtos.OrganizationDto;
+import com.example.accountmanagementsystem.constants.Errors;
 import com.example.accountmanagementsystem.entities.EnterpriseDetail;
 import com.example.accountmanagementsystem.entities.ExpenseCenterDetail;
 import com.example.accountmanagementsystem.entities.LocationDetail;
 import com.example.accountmanagementsystem.entities.OrganizationDetail;
+import com.example.accountmanagementsystem.exception.InvalidRequestException;
 import com.example.accountmanagementsystem.repository.EntepriseRepository;
 import com.example.accountmanagementsystem.repository.ExpenseCenterRepository;
 import com.example.accountmanagementsystem.repository.LocationRepository;
@@ -43,7 +45,7 @@ public class ReaderServiceImpl implements ReaderService {
         entepriseRepository.findEnterpriseDetailsByOrganizationDetail(organizationId);
     if(organizationDetail.isPresent())
       return OrganizationDto.getOrganizationDto(organizationDetail.get(), enterpriseDetails);
-    throw new RuntimeException("Invalid OrganizationId");
+    throw new InvalidRequestException(Errors.Organization.INVALID_ORG_ID);
   }
 
   @Override
@@ -53,7 +55,7 @@ public class ReaderServiceImpl implements ReaderService {
         locationRepository.findLocationDetailsByEnterpriseDetail(enterpriseId);
     if(enterpriseDetail.isPresent())
       return EnterpriseDto.getEnterpriseDto(enterpriseDetail.get(), locationDetails);
-    throw new RuntimeException("Invalid EnterpriseId");
+    throw new InvalidRequestException(Errors.Organization.INVALID_ENTERPRISE_ID);
   }
 
   @Override
@@ -63,7 +65,7 @@ public class ReaderServiceImpl implements ReaderService {
         expenseCenterRepository.findExpenseCenterDetailsByLocationDetail(locationId);
     if(locationDetail.isPresent())
       return LocationDto.getLocationDto(locationDetail.get(), expenseCenterDetails);
-    throw new RuntimeException("Invalid LocationId");
+    throw new InvalidRequestException(Errors.Organization.INVALID_LOCATION_ID);
   }
 
   @Override
