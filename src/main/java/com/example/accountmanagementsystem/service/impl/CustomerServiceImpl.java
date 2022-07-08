@@ -28,6 +28,7 @@ import com.example.accountmanagementsystem.repository.DistChannelRepository;
 import com.example.accountmanagementsystem.repository.OrganizationRepository;
 import com.example.accountmanagementsystem.service.CustomerService;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -101,17 +102,14 @@ public class CustomerServiceImpl implements CustomerService {
 
     Optional<String> customerCodeByOrgId =
         customerDetailRepository.findCustomerCodeByOrgId(customerRequest.getOrganizationId());
-//    Integer customerCode = 0;
-//    if(customerCodeByOrgId.isEmpty()) {
-//      customerCode = customerRequest.getOrganizationId() * CUSTOMER_START_VALUE;
-//    } else {
-//      customerCode = customerCodeByOrgId.get() + CUSTOMER_INCREMENT_VALUE;
-//    }
+    String customerCode = generateCustomerCode(customerCodeByOrgId, organizationDetail.get());
     CustomerBasicDetail customerBasicDetail = customerDetailRepository.save(CustomerBasicDetail.builder()
-        .customerCode("Caaaaa")
+        .customerCode(customerCode)
         .customerName(customerRequest.getCustomerName())
         .customerAddress(customerRequest.getCustomerAddress())
         .customerPinCode(customerRequest.getPinCode())
+        .customerCommData(new HashSet<>())
+        .customerPaymentData(new HashSet<>())
         .organizationDetail(organizationDetail.get())
         .build());
 
@@ -128,6 +126,14 @@ public class CustomerServiceImpl implements CustomerService {
     customerCommData.forEach(customerBasicDetail::addCustomerCommData);
     customerDetailRepository.save(customerBasicDetail);
     return CustomerDto.getCustomerDto(customerBasicDetail, customerPurchasingData, customerPaymentData, customerCommData);
+  }
+
+  private String generateCustomerCode(Optional<String> customerCodeByOrgId, OrganizationDetail organizationDetail) {
+    Integer startCustomerCode = organizationDetail.getOrgId()*CUSTOMER_START_VALUE;
+    return customerCodeByOrgId.map(cc -> {
+      Integer lastIncrementValue = Integer.parseInt(cc.substring(2)) + CUSTOMER_INCREMENT_VALUE;
+      return "cc"+ lastIncrementValue;
+    }).orElse("cc"+startCustomerCode);
   }
 
   @Override
@@ -168,12 +174,10 @@ public class CustomerServiceImpl implements CustomerService {
                 .bankIfscCode(bankIfscMap.get(c.getIfscCode()))
                 .accountType(c.getAccountType())
                 .accountHolderName(c.getAccountHolderName())
-                .customerBasicDetails(Collections.EMPTY_SET)
+                .customerBasicDetails(new HashSet<>())
                 .build())).collect(Collectors.toList());
-    for (CustomerPaymentData c : customerPaymentDataList) {
-      customerBasicDetail.get().addCustomerPaymentData(c);
-      c.getCustomerBasicDetails().add(customerBasicDetail.get());
-    }
+    customerPaymentDataList.forEach(c -> customerBasicDetail.get().addCustomerPaymentData(c));
+    customerDetailRepository.save(customerBasicDetail.get());
     return customerPaymentDataList;
   }
 
@@ -190,11 +194,10 @@ public class CustomerServiceImpl implements CustomerService {
             CustomerCommData.builder()
                 .communicationType(c.getCommunicationType())
                 .communicationData(c.getCommunicationData())
-                .customerBasicDetails(Collections.EMPTY_SET)
+                .customerBasicDetails(new HashSet<>())
                 .build())).collect(Collectors.toList());
-    for (CustomerCommData c : customerCommDataList) {
-      customerBasicDetail.get().addCustomerCommData(c);
-    }
+    customerCommDataList.forEach(c-> customerBasicDetail.get().addCustomerCommData(c));
+    customerDetailRepository.save(customerBasicDetail.get());
     return customerCommDataList;
   }
 }
