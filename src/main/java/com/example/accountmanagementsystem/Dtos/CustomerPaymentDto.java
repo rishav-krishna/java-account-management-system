@@ -1,16 +1,19 @@
 package com.example.accountmanagementsystem.Dtos;
 
 import com.example.accountmanagementsystem.entities.CustomerPaymentData;
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerPaymentDto {
+public class CustomerPaymentDto implements Serializable {
 
   private Integer customerPaymentId;
   private String customerAccountNbr;

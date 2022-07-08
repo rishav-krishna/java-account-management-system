@@ -20,11 +20,7 @@ import lombok.NoArgsConstructor;
 public class DistributionChannel {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "channel_id")
-  private Integer channelId;
-
-  @Column(name = "dist_channel_code")
+  @Column(name = "dist_channel_code", nullable = false)
   private String distChannelCode;
 
   @Column(name = "dist_channel_name")

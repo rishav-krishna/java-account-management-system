@@ -18,10 +18,7 @@ import lombok.NoArgsConstructor;
 public class CreditTerm {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
-  @Column(name = "credit_term_code")
+  @Column(name = "credit_term_code", nullable = false)
   private String creditTermCode;
 
   @Column(name = "credit_term_name")

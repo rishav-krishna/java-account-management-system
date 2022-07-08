@@ -1,5 +1,7 @@
 package com.example.accountmanagementsystem.entities;
 
+import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Getter@Setter
-public class CustomerPaymentData {
+public class CustomerPaymentData implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,5 +46,5 @@ public class CustomerPaymentData {
   private String accountHolderName;
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "customerPaymentData")
-  private Set<CustomerBasicDetail> customerBasicDetails;
+  private Set<CustomerBasicDetail> customerBasicDetails = new HashSet<>();
 }

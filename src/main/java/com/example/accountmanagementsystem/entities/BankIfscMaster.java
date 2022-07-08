@@ -19,9 +19,6 @@ import lombok.Setter;
 public class BankIfscMaster {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
   @Column(name = "branch_ifsc_code")
   private String branchIfscCode;
 

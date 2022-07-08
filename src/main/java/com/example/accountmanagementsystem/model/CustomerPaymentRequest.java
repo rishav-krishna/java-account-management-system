@@ -13,7 +13,7 @@ import lombok.Setter;
 public class CustomerPaymentRequest implements Serializable {
 
   private String customerAccountNumber;
-  private String IfscCode;
+  private String ifscCode;
   private String accountType;
   private String accountHolderName;
 }

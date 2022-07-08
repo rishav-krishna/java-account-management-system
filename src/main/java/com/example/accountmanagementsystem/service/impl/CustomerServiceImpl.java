@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -91,6 +92,7 @@ public class CustomerServiceImpl implements CustomerService {
   }
 
   @Override
+  @Transactional
   public CustomerDto addCustomer(CustomerRequest customerRequest) {
     Optional<OrganizationDetail> organizationDetail =
         organizationRepository.findById(customerRequest.getOrganizationId());
@@ -136,17 +138,19 @@ public class CustomerServiceImpl implements CustomerService {
     Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
     if(customerBasicDetail.isEmpty())
       throw new InvalidRequestException(Errors.Customer.INVALID_CUSTOMER_ID);
-    return customerPurchasingRequests.stream().map(c -> customerPurchasingRepository.save(
-        CustomerPurchasingData.builder()
-            .customerVatTin(c.getCustomerVatTin())
-            .customerGstNbr(c.getCustomerGstNbr())
-            .customerPanNbr(c.getCustomerPanNbr())
-            .customerTanNbr(c.getCustomerTanNbr())
-            .customerUdyogAadharNbr(c.getCustomerUdyogAadharNbr())
-            .customerCreditTerm(creditTermMap.get(c.getCustomerCreditTermCode()))
-            .distributionChannel(distChnlMap.get(c.getDistributionChannelCode()))
-            .customerBasicDetail(customerBasicDetail.get())
-            .build())).collect(Collectors.toList());
+    List<CustomerPurchasingData> customerPurchasingData =
+        customerPurchasingRequests.stream().map(c -> customerPurchasingRepository.save(
+            CustomerPurchasingData.builder()
+                .customerVatTin(c.getCustomerVatTin())
+                .customerGstNbr(c.getCustomerGstNbr())
+                .customerPanNbr(c.getCustomerPanNbr())
+                .customerTanNbr(c.getCustomerTanNbr())
+                .customerUdyogAadharNbr(c.getCustomerUdyogAadharNbr())
+                .customerCreditTerm(creditTermMap.get(c.getCustomerCreditTermCode()))
+                .distributionChannel(distChnlMap.get(c.getDistributionChannelCode()))
+                .customerBasicDetail(customerBasicDetail.get())
+                .build())).collect(Collectors.toList());
+    return customerPurchasingData;
   }
 
   @Override
@@ -157,13 +161,20 @@ public class CustomerServiceImpl implements CustomerService {
     Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
     if(customerBasicDetail.isEmpty())
       throw new InvalidRequestException(Errors.Customer.INVALID_CUSTOMER_ID);
-    return customerPaymentRequests.stream().map(c-> customerPaymentRepository.save(
-        CustomerPaymentData.builder()
-            .customerAccountNbr(c.getCustomerAccountNumber())
-            .bankIfscCode(bankIfscMap.get(c.getIfscCode()))
-            .accountType(c.getAccountType())
-            .accountHolderName(c.getAccountHolderName())
-            .build())).collect(Collectors.toList());
+    List<CustomerPaymentData> customerPaymentDataList =
+        customerPaymentRequests.stream().map(c -> customerPaymentRepository.save(
+            CustomerPaymentData.builder()
+                .customerAccountNbr(c.getCustomerAccountNumber())
+                .bankIfscCode(bankIfscMap.get(c.getIfscCode()))
+                .accountType(c.getAccountType())
+                .accountHolderName(c.getAccountHolderName())
+                .customerBasicDetails(Collections.EMPTY_SET)
+                .build())).collect(Collectors.toList());
+    for (CustomerPaymentData c : customerPaymentDataList) {
+      customerBasicDetail.get().addCustomerPaymentData(c);
+      c.getCustomerBasicDetails().add(customerBasicDetail.get());
+    }
+    return customerPaymentDataList;
   }
 
   @Override
@@ -174,10 +185,16 @@ public class CustomerServiceImpl implements CustomerService {
     Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
     if(customerBasicDetail.isEmpty())
       throw new InvalidRequestException(Errors.Customer.INVALID_CUSTOMER_ID);
-    return customerCommunicationRequests.stream().map(c->customerCommRepository.save(
-        CustomerCommData.builder()
-            .communicationType(c.getCommunicationType())
-            .communicationData(c.getCommunicationData())
-            .build())).collect(Collectors.toList());
+    List<CustomerCommData> customerCommDataList =
+        customerCommunicationRequests.stream().map(c -> customerCommRepository.save(
+            CustomerCommData.builder()
+                .communicationType(c.getCommunicationType())
+                .communicationData(c.getCommunicationData())
+                .customerBasicDetails(Collections.EMPTY_SET)
+                .build())).collect(Collectors.toList());
+    for (CustomerCommData c : customerCommDataList) {
+      customerBasicDetail.get().addCustomerCommData(c);
+    }
+    return customerCommDataList;
   }
 }

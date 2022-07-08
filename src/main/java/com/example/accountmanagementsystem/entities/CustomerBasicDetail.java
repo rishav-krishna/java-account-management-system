@@ -50,15 +50,15 @@ public class CustomerBasicDetail {
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "customer_comm_intermidate", joinColumns =
-      {@JoinColumn(referencedColumnName = "customer_id")}
-      , inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")})
-  private Set<CustomerCommData> customerCommData = new java.util.LinkedHashSet<>();
+      {@JoinColumn(name = "customer_id", referencedColumnName = "customer_id")}
+      , inverseJoinColumns = {@JoinColumn(name = "customer_comm_id", referencedColumnName = "id")})
+  private Set<CustomerCommData> customerCommData = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "customer_bank_intermidate", joinColumns =
-      {@JoinColumn(referencedColumnName = "customer_id")}
-      , inverseJoinColumns = {@JoinColumn(referencedColumnName = "customer_payment_id")})
-  private Set<CustomerPaymentData> customerPaymentData = new java.util.LinkedHashSet<>();
+      {@JoinColumn(name = "customer_id", referencedColumnName = "customer_id")}
+      , inverseJoinColumns = {@JoinColumn(name = "customer_payment_id", referencedColumnName = "customer_payment_id")})
+  private Set<CustomerPaymentData> customerPaymentData = new HashSet<>();
 
   public void addCustomerPaymentData(CustomerPaymentData customerPaymentData) {
     this.customerPaymentData.add(customerPaymentData);

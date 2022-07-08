@@ -1,5 +1,6 @@
 package com.example.accountmanagementsystem.entities;
 
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,5 +35,5 @@ public class CustomerCommData {
   private String communicationType;
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "customerCommData")
-  private Set<CustomerBasicDetail> customerBasicDetails = new java.util.LinkedHashSet<>();;
+  private Set<CustomerBasicDetail> customerBasicDetails = new HashSet<>();
 }

@@ -1,6 +1,7 @@
 package com.example.accountmanagementsystem.Dtos;
 
 import com.example.accountmanagementsystem.entities.CustomerCommData;
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter@Setter
-public class CustomerCommDto {
+public class CustomerCommDto implements Serializable {
 
   private Integer id;
   private String communicationData;
