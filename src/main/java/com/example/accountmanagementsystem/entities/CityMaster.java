@@ -35,6 +35,6 @@ public class CityMaster {
   @Column(name = "state_name")
   private String stateName;
 
-  @Column(name = "contry_Name")
+  @Column(name = "country_Name")
   private String countryName;
 }
