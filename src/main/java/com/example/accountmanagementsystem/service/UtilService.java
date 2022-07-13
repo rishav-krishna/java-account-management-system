@@ -1,5 +1,6 @@
 package com.example.accountmanagementsystem.service;
 
+import com.example.accountmanagementsystem.entities.BankIfscMaster;
 import com.example.accountmanagementsystem.entities.CityMaster;
 import com.example.accountmanagementsystem.entities.CreditTerm;
 import com.example.accountmanagementsystem.entities.DistributionChannel;
@@ -12,4 +13,5 @@ public interface UtilService {
   List<DistributionChannel> getAllDistributionChannel();
 //  List<PaymentTemr> getAllPaymentTerms();
   Optional<CityMaster> getCityDetail(Integer pinCode);
+  Optional<BankIfscMaster> getBankDetail(String ifscCode);
 }

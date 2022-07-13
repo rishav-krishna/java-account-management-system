@@ -4,6 +4,7 @@ import com.example.accountmanagementsystem.Dtos.CustomerCommDto;
 import com.example.accountmanagementsystem.Dtos.CustomerDto;
 import com.example.accountmanagementsystem.Dtos.CustomerPaymentDto;
 import com.example.accountmanagementsystem.Dtos.CustomerPurchasingDto;
+import com.example.accountmanagementsystem.entities.BankIfscMaster;
 import com.example.accountmanagementsystem.entities.CityMaster;
 import com.example.accountmanagementsystem.entities.CreditTerm;
 import com.example.accountmanagementsystem.entities.CustomerCommData;
@@ -85,5 +86,14 @@ public class CustomerController {
       throw new RuntimeException("Invalid pinCode");
     }
     return new ResponseEntity<>(cityDetail.get(), HttpStatus.OK);
+  }
+
+  @GetMapping("/get-bank-detail/{ifscCode}")
+  public ResponseEntity<BankIfscMaster> getBankDetail(@PathVariable("ifscCode") String ifscCode) {
+    Optional<BankIfscMaster> bankDetail = utilService.getBankDetail(ifscCode);
+    if(bankDetail.isEmpty()) {
+      throw new RuntimeException("Invalid IFSC Code");
+    }
+    return new ResponseEntity<>(bankDetail.get(), HttpStatus.OK);
   }
 }
