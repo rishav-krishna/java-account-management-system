@@ -4,6 +4,8 @@ import com.example.accountmanagementsystem.entities.CustomerBasicDetail;
 import com.example.accountmanagementsystem.entities.CustomerCommData;
 import com.example.accountmanagementsystem.entities.CustomerPaymentData;
 import com.example.accountmanagementsystem.entities.CustomerPurchasingData;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +25,11 @@ public class CustomerDto {
   private String customerAddress;
   private String customerCode;
   private Integer pinCode;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<CustomerPurchasingDto> customerPurchasingDtos;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<CustomerPaymentDto> customerPaymentDtos;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private List<CustomerCommDto> customerCommDtos;
 
   public static CustomerDto getCustomerDto(final CustomerBasicDetail customerBasicDetail,

@@ -96,4 +96,15 @@ public class CustomerController {
     }
     return new ResponseEntity<>(bankDetail.get(), HttpStatus.OK);
   }
+
+  @GetMapping("/get-customers/{organizationId}")
+  public ResponseEntity<List<CustomerDto>> getCustomerDtos(@PathVariable("organizationId") Integer orgId) {
+    return new ResponseEntity<>(customerService.getCustomers(orgId), HttpStatus.OK);
+  }
+
+  @GetMapping("/get-customer-customerId/{customerId}")
+  public ResponseEntity<CustomerDto> getCustomerById(@PathVariable("customerId") Integer customerId) {
+    CustomerDto customerById = customerService.getCustomerById(customerId);
+    return new ResponseEntity<>(customerById, HttpStatus.OK);
+  }
 }

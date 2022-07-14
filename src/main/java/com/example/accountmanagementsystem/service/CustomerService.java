@@ -10,6 +10,7 @@ import com.example.accountmanagementsystem.model.CustomerPaymentRequest;
 import com.example.accountmanagementsystem.model.CustomerPurchasingRequest;
 import com.example.accountmanagementsystem.model.CustomerRequest;
 import java.util.List;
+import java.util.Optional;
 
 public interface CustomerService {
 
@@ -17,4 +18,6 @@ public interface CustomerService {
   List<CustomerPurchasingData> addCustomerPurchasingData(List<CustomerPurchasingRequest> customerPurchasingRequests, Integer customerId);
   List<CustomerPaymentData> addCustomerPaymentDetail(List<CustomerPaymentRequest> customerPaymentRequests, Integer customerId);
   List<CustomerCommData> addCustomerCommDetail(List<CustomerCommunicationRequest> customerCommunicationRequests, Integer customerId);
+  List<CustomerDto> getCustomers(Integer orgId);
+  CustomerDto getCustomerById(Integer customerId);
 }

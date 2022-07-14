@@ -2,6 +2,7 @@ package com.example.accountmanagementsystem.service.impl;
 
 import static com.example.accountmanagementsystem.constants.ApplicationConstants.CUSTOMER_INCREMENT_VALUE;
 import static com.example.accountmanagementsystem.constants.ApplicationConstants.CUSTOMER_START_VALUE;
+import static com.example.accountmanagementsystem.constants.Errors.Customer.INVALID_CUSTOMER_ID;
 
 import com.example.accountmanagementsystem.Dtos.CustomerDto;
 import com.example.accountmanagementsystem.constants.Errors;
@@ -143,7 +144,7 @@ public class CustomerServiceImpl implements CustomerService {
       return Collections.emptyList();
     Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
     if(customerBasicDetail.isEmpty())
-      throw new InvalidRequestException(Errors.Customer.INVALID_CUSTOMER_ID);
+      throw new InvalidRequestException(INVALID_CUSTOMER_ID);
     List<CustomerPurchasingData> customerPurchasingData =
         customerPurchasingRequests.stream().map(c -> customerPurchasingRepository.save(
             CustomerPurchasingData.builder()
@@ -166,7 +167,7 @@ public class CustomerServiceImpl implements CustomerService {
       return Collections.emptyList();
     Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
     if(customerBasicDetail.isEmpty())
-      throw new InvalidRequestException(Errors.Customer.INVALID_CUSTOMER_ID);
+      throw new InvalidRequestException(INVALID_CUSTOMER_ID);
     List<CustomerPaymentData> customerPaymentDataList =
         customerPaymentRequests.stream().map(c -> customerPaymentRepository.save(
             CustomerPaymentData.builder()
@@ -188,7 +189,7 @@ public class CustomerServiceImpl implements CustomerService {
       return Collections.emptyList();
     Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
     if(customerBasicDetail.isEmpty())
-      throw new InvalidRequestException(Errors.Customer.INVALID_CUSTOMER_ID);
+      throw new InvalidRequestException(INVALID_CUSTOMER_ID);
     List<CustomerCommData> customerCommDataList =
         customerCommunicationRequests.stream().map(c -> customerCommRepository.save(
             CustomerCommData.builder()
@@ -199,5 +200,34 @@ public class CustomerServiceImpl implements CustomerService {
     customerCommDataList.forEach(c-> customerBasicDetail.get().addCustomerCommData(c));
     customerDetailRepository.save(customerBasicDetail.get());
     return customerCommDataList;
+  }
+
+  @Override
+  public List<CustomerDto> getCustomers(Integer orgId) {
+    List<CustomerBasicDetail> customerDetails =
+        customerDetailRepository.findAllByOrganizationDetail(orgId);
+    return customerDetails.stream().map(c -> CustomerDto.builder()
+        .customerId(c.getCustomerId())
+        .customerName(c.getCustomerName())
+        .customerAddress(c.getCustomerAddress())
+        .customerCode(c.getCustomerCode())
+        .pinCode(c.getCustomerPinCode())
+        .build()).collect(Collectors.toList());
+  }
+
+  @Override
+  public CustomerDto getCustomerById(Integer customerId) {
+    Optional<CustomerBasicDetail> customerBasicDetail = customerDetailRepository.findById(customerId);
+    if(customerBasicDetail.isEmpty()) {
+      throw new InvalidRequestException(INVALID_CUSTOMER_ID);
+    }
+
+    final List<CustomerPurchasingData> purchasingDataList =
+        customerPurchasingRepository.findByCustomerBasicDetail(customerId);
+    List<CustomerPaymentData> customerPaymentDataList =
+        customerPaymentRepository.findAllByCustomerBasicDetail(customerId);
+    final List<CustomerCommData> customerCommDataList =
+        customerCommRepository.findAllByCustomerBasicDetail(customerId);
+    return CustomerDto.getCustomerDto(customerBasicDetail.get(), purchasingDataList,customerPaymentDataList, customerCommDataList);
   }
 }
